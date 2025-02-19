@@ -104,11 +104,12 @@ for fact in fact_ar:
             pl=(i-1)*Nx+j
             # print(i,j)
 
-            j_mur = int(np.rint(Lm/d)-0.1/d)
-            j_mur_fin = int(np.rint(Lm/d)-0.1/d)
+            j_mur = int(np.rint((Lm-0.2)/d))
+            j_mur_fin = int(np.rint((Lm-0.2)/d))
+            #print("Truc indice",j_mur)
             #j_fin_mur = int(np.rint((Lx - Lm) / d))
-            i_mur = int(np.rint(Lm/d)-0.1/d)
-            i_mur_fin = int(np.rint(Lm/d)-0.1/d)
+            i_mur = int(np.rint((Lm)/d))
+            i_mur_fin = int(np.rint((Lm)/d))
             #i_fin_mur = int(np.rint((Ly - Lm) / d))
 
             if (((i>1) and (i<Ny)) and ((j>1) and (j<Nx))):
@@ -123,7 +124,7 @@ for fact in fact_ar:
                             # ######JAI MODIFIER ICI (Debut)
 
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lm
-                if (j == j_mur) and ( i_mur< i< Ny-i_mur):
+                if (j == j_mur) and ( i_mur < i < Ny-i_mur):
                     #print("1er valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4*km; # contribution de noeud (i,j-1)
