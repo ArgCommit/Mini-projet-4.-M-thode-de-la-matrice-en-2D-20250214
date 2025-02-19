@@ -19,7 +19,7 @@ Ta=-20; #oC
 
 # (2) Condition de Dirichlet sur le plafond et sur le plancher
 # T(x, y=0 ou y=Ly)=Tp
-Tp=0; #oC
+#Tp=0; #oC
 
 # Dimensions d'appartement
 Lx=4; #[m]
@@ -33,7 +33,7 @@ h=10; #W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieur
 # Paramètres de l'air qui remplit l'appartement
 ka=0.024
 
-fact_ar = np.array([1.0, 0.5, 0.25, 0.125, 0.0625], dtype=np.double); # Matrice pleine , 0.25, 0.125, 0.0625 fact_ar = np.array([.5])
+fact_ar = np.array([1.0, 0.5, 0.25, 0.125, 0.0625], dtype=np.double); # Matrice pleine
 d_ar=np.zeros(fact_ar.size,dtype=np.double)
 tini_ar=np.zeros(fact_ar.size,dtype=np.double)
 tinv_ar=np.zeros(fact_ar.size,dtype=np.double)
@@ -123,35 +123,45 @@ for fact in fact_ar:
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lm
                 if (j== j_mur) and ( i_mur< i< Ny-i_mur):
                     #print("1er valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
-                    pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
-                    pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
-                    #pc=(i-2)*Nx+j;M[pl-1,pc-1]=(km+ka)/2; # contribution de noeud (i-1,j)
-                    #pc=(i)*Nx+j;M[pl-1,pc-1]=(km+ka)/2; # contribution de noeud (i+1,j)
-                    b[pl-1]=Tp
+                    pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
+                    pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4*km; # contribution de noeud (i,j-1)
+                    pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i,j+1)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin je sais pas si c'est bon"
+                    pc=(i-1)*Nx+j+2;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+2)
+                    pc=(i-1)*Nx+j-2;M[pl-1,pc-1]=km; # contribution de noeud (i,j-2)
+                    b[pl-1]=0
                 
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lx-Lm
                 if (j == Nx-j_mur) and ( Ny-i_mur> i > i_mur):
                     #print("2e valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
-                    pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-1)
-                    pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=km; # contribution de noeud (i,j+1)
-                    b[pl-1]=Tp
+                    pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
+                    pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i,j-1)
+                    pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=-4*km; # contribution de noeud (i,j+1)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin"
+                    pc=(i-1)*Nx+j+2;M[pl-1,pc-1]=km; # contribution de noeud (i,j+2)
+                    pc=(i-1)*Nx+j-2;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-2)
+                    b[pl-1]=0
                     
-                    
+                    #Contion du flux de chaleur sur la surfaces intérieures à y = Lm
                 if (i == i_mur) and ( Nx - j_mur > j > j_mur) :
                     #print("3e valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
-                    pc=(i-2)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i-1,j)
-                    pc=(i)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+1,j)
-                    b[pl-1]=Tp
+                    pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
+                    pc=(i-2)*Nx+j;M[pl-1,pc-1]=-4*km; # contribution de noeud (i-1,j)
+                    pc=(i)*Nx+j;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i+1,j)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin"
+                    pc=(i-3)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i-2,j)
+                    pc=(i+1)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+2,j)
+                    b[pl-1]=0
 
                 if (i == Ny-i_mur)  and (j_mur <j < Nx - j_mur):
                     #print("4e valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
-                    pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-1,j)
-                    pc=(i)*Nx+j;M[pl-1,pc-1]= km; # contribution de noeud (i+1,j)
-                    b[pl-1]=Tp
+                    pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
+                    pc=(i-2)*Nx+j;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i-1,j)
+                    pc=(i)*Nx+j;M[pl-1,pc-1]=-4*km; # contribution de noeud (i+1,j)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin"
+                    pc=(i-3)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-2,j)
+                    pc=(i+1)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i+2,j)
+                    b[pl-1]=0
                     
                             # ######JAI MODIFIER ICI  (fifn)
 ##################Jai modifier ici (Debut)
@@ -163,7 +173,7 @@ for fact in fact_ar:
                 pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,1)
                 pc=(i-1)*Ny+j+1;M[pl-1,pc-1]=-4; # contribution de noeud (i,2)
                 pc=(i-1)*Ny+j+2;M[pl-1,pc-1]=1; # contribution de noeud (i,3)
-                b[pl-1]=2*d*h*Ta/k[i-1,j-1]
+                b[pl-1]=2*d*h*Ta/km
 
                 
             elif (i==Ny):
@@ -173,7 +183,7 @@ for fact in fact_ar:
                 pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,Ny)
                 pc=(i-1)*Ny+j-1;M[pl-1,pc-1]=-4; # contribution de noeud (i,Ny-1)
                 pc=(i-1)*Ny+j-2;M[pl-1,pc-1]=1; # contribution de noeud (i,Ny-2)
-                b[pl-1]=2*d*h*Ta/k[i-1,j-1]
+                b[pl-1]=2*d*h*Ta/km
 
 ##################Jai modifier ici (Fin)
             elif (j==1):
@@ -181,13 +191,13 @@ for fact in fact_ar:
                 pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,1)
                 pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=-4; # contribution de noeud (i,2)
                 pc=(i-1)*Nx+j+2;M[pl-1,pc-1]=1; # contribution de noeud (i,3)
-                b[pl-1]=2*d*h*Ta/k[i-1,j-1]
+                b[pl-1]=2*d*h*Ta/km
             elif (j==Nx):
                 # noeud à la surface externe du mur x=Nx
                 pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,Nx)
                 pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4; # contribution de noeud (i,Nx-1)
                 pc=(i-1)*Nx+j-2;M[pl-1,pc-1]=1; # contribution de noeud (i,Nx-2)
-                b[pl-1]=2*d*h*Ta/k[i-1,j-1]
+                b[pl-1]=2*d*h*Ta/km
 
                 # b[pl-1]=0;
 
