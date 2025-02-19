@@ -33,7 +33,8 @@ h=10; #W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieur
 # Paramètres de l'air qui remplit l'appartement
 ka=0.024
 
-fact_ar = np.array([1.0, 0.5, 0.25, 0.125, 0.0625], dtype=np.double); # Matrice pleine
+# fact_ar = np.array([1.0, 0.5, 0.25, 0.125, 0.0625], dtype=np.double); # Matrice pleine
+fact_ar = np.array([0.25], dtype=np.double); # Matrice pleine
 d_ar=np.zeros(fact_ar.size,dtype=np.double)
 tini_ar=np.zeros(fact_ar.size,dtype=np.double)
 tinv_ar=np.zeros(fact_ar.size,dtype=np.double)
@@ -97,23 +98,18 @@ for fact in fact_ar:
     b=np.zeros((Nx*Ny,1),dtype=np.double)
     T=np.zeros((Nx*Ny,1),dtype=np.double)
     Tr=np.zeros((Ny,Nx),dtype=np.double)
+    j_mur=int((Lm/d) * Nx) - 1
+    i_mur=int((Lm/d) * Ny) - 1
+    j_mur_fin = Nx - j_mur + 2
+    i_mur_fin = Ny - i_mur + 2
+
     
     for i in np.arange(1,Ny+1,1):
         for j in np.arange(1,Nx+1,1):
             # remplir la ligne pl de la matrice M
             pl=(i-1)*Nx+j
-            # print(i,j)
-
-            j_mur = int(np.rint((Lm-0.2)/d))
-            j_mur_fin = int(np.rint((Lm-0.2)/d))
-            #print("Truc indice",j_mur)
-            #j_fin_mur = int(np.rint((Lx - Lm) / d))
-            i_mur = int(np.rint((Lm)/d))
-            i_mur_fin = int(np.rint((Lm)/d))
-            #i_fin_mur = int(np.rint((Ly - Lm) / d))
 
             if (((i>1) and (i<Ny)) and ((j>1) and (j<Nx))):
-
                 # noeud qui est strictement à l'intérieur de la cellule de simulation
                 pc=pl;M[pl-1,pc-1]=-4; # contribution de noeud (i,j)
                 pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=1; # contribution de noeud (i,j-1)
@@ -121,10 +117,10 @@ for fact in fact_ar:
                 pc=(i-2)*Nx+j;M[pl-1,pc-1]=1; # contribution de noeud (i-1,j)
                 pc=(i)*Nx+j;M[pl-1,pc-1]=1; # contribution de noeud (i+1,j)
                 b[pl-1]=-d**2*S[i-1,j-1]/k[i-1,j-1]
-                            # ######JAI MODIFIER ICI (Debut)
-
+                            #######JAI MODIFIER ICI (Debut)
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lm
-                if (j == j_mur) and ( i_mur < i < Ny-i_mur):
+                # if (j == j_mur) and ( i_mur < i < Ny-i_mur):
+                if (j == j_mur) and i_mur <= i and i <= Ny-i_mur:
                     #print("1er valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4*km; # contribution de noeud (i,j-1)
@@ -135,7 +131,7 @@ for fact in fact_ar:
                     b[pl-1]=0
                 
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lx-Lm
-                if (j == Nx-j_mur_fin) and ( Ny-i_mur> i > i_mur):
+                if (j == j_mur_fin) and Ny-i_mur >= i and i >= i_mur:
                     #print("2e valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i,j-1)
@@ -146,7 +142,7 @@ for fact in fact_ar:
                     b[pl-1]=0
                     
                     #Contion du flux de chaleur sur la surfaces intérieures à y = Lm
-                if (i == i_mur) and ( Nx - j_mur > j > j_mur) :
+                if (i == i_mur) and Nx - j_mur >= j and j >= j_mur :
                     #print("3e valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=-4*km; # contribution de noeud (i-1,j)
@@ -156,7 +152,7 @@ for fact in fact_ar:
                     pc=(i+1)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+2,j)
                     b[pl-1]=0
 
-                if (i == Ny-i_mur_fin)  and (j_mur <j < Nx - j_mur):
+                if (i == i_mur_fin)  and j_mur <=j and j<= Nx - j_mur:
                     #print("4e valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i-1,j)
@@ -246,7 +242,8 @@ for fact in fact_ar:
     
     Tm_ar[ci]=Tr[int(np.rint(Ly/d/2+1))-1,int(np.rint(Lx/d/2+1))-1]; # température au milieu du domaine de calcul
 
-#print("truc des axes des figure",np.arange(0,Nx,1)*d)
+
+###############################
 print("Tr",Tr)
 print("Tm_ar",Tm_ar)
 
@@ -295,5 +292,3 @@ plt.xlabel('Pas $d_x=d_y$ [m]')
 plt.ylabel('t [s]')
 plt.legend(['$t_{initialisation}$','$t_{inversion}$'])
 plt.show()
-
-print("allo")
