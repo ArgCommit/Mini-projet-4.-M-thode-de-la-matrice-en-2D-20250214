@@ -104,10 +104,12 @@ for fact in fact_ar:
             pl=(i-1)*Nx+j
             # print(i,j)
 
-            j_mur = int(np.rint(Lm/d))
-            j_fin_mur = int(np.rint((Lx - Lm) / d))
-            i_mur = int(np.rint(Lm/d))
-            i_fin_mur = int(np.rint((Ly - Lm) / d))
+            j_mur = int(np.rint(Lm/d)-0.1/d)
+            j_mur_fin = int(np.rint(Lm/d)-0.1/d)
+            #j_fin_mur = int(np.rint((Lx - Lm) / d))
+            i_mur = int(np.rint(Lm/d)-0.1/d)
+            i_mur_fin = int(np.rint(Lm/d)-0.1/d)
+            #i_fin_mur = int(np.rint((Ly - Lm) / d))
 
             if (((i>1) and (i<Ny)) and ((j>1) and (j<Nx))):
 
@@ -121,7 +123,7 @@ for fact in fact_ar:
                             # ######JAI MODIFIER ICI (Debut)
 
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lm
-                if (j== j_mur) and ( i_mur< i< Ny-i_mur):
+                if (j == j_mur) and ( i_mur< i< Ny-i_mur):
                     #print("1er valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4*km; # contribution de noeud (i,j-1)
@@ -132,7 +134,7 @@ for fact in fact_ar:
                     b[pl-1]=0
                 
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lx-Lm
-                if (j == Nx-j_mur) and ( Ny-i_mur> i > i_mur):
+                if (j == Nx-j_mur_fin) and ( Ny-i_mur> i > i_mur):
                     #print("2e valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i,j-1)
@@ -153,7 +155,7 @@ for fact in fact_ar:
                     pc=(i+1)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+2,j)
                     b[pl-1]=0
 
-                if (i == Ny-i_mur)  and (j_mur <j < Nx - j_mur):
+                if (i == Ny-i_mur_fin)  and (j_mur <j < Nx - j_mur):
                     #print("4e valeur de ij",'i=',i,'j=',j)
                     pc=pl;M[pl-1,pc-1]=3*(km+ka); # contribution de noeud (i,j)
                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=-4*ka; # contribution de noeud (i-1,j)
